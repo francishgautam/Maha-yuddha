@@ -77,14 +77,15 @@ class CreateCharacter {
         ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 
         //Attack box
+        ctx.fillStyle = 'red';
         ctx.fillRect(this.attackRange.position.x,this.attackRange.position.y,this.attackRange.width,this.attackRange.height);
 
-        if(this.isAttackingUpper == true){
-            this.drawAttackUpper();
-        }
-        if(this.isAttackingLower == true){
-            this.drawAttackLower();
-        }
+        // if(this.isAttackingUpper == true){
+        //     this.drawAttackUpper();
+        // }
+        // if(this.isAttackingLower == true){
+        //     this.drawAttackLower();
+        // }
     }
 
     //Attack creation function
@@ -166,7 +167,7 @@ const enemyCharacter = new CreateCharacter(
     }
 );
 
-function upperAttackDetection(playerAttackRectangle,enemyAttackRectangle){
+function upperAttackDetection({playerAttackRectangle,enemyAttackRectangle}){
     return(
         playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
         playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
@@ -217,23 +218,31 @@ function startAnimation(){
       upperAttackDetection({playerAttackRectangle : playerCharacter, enemyAttackRectangle : enemyCharacter}) && playerCharacter.isAttackingUpper
     ) {
         playerCharacter.isAttackingUpper = false;
-        console.log('Upper attack detected');
+        console.log('Upper attack detected by player');
     }
 
     if (
         upperAttackDetection({playerAttackRectangle : enemyCharacter, enemyAttackRectangle : playerCharacter}) && enemyCharacter.isAttackingUpper
       ) {
           playerCharacter.isAttackingUpper = false;
-          console.log('Upper attack detected');
+          console.log('Upper attack detected by wnwmy');
       }
 
     // Collision detection for lower attack
     if (
-      lowerAttackDetection(playerCharacter,enemyCharacter) && playerCharacter.isAttackingLower
+      lowerAttackDetection({playerAttackRectangle: playerCharacter,enemyAttackRectangle : enemyCharacter}) && playerCharacter.isAttackingLower
     ) {
         playerCharacter.isAttackingLower = false;
-        console.log('Lower attack detected');
+        console.log('Lower attack detected by player');
     }
+
+    if (
+        lowerAttackDetection({playerAttackRectangle: enemyCharacter,enemyAttackRectangle : playerCharacter}) && enemyCharacter.isAttackingLower
+      ) {
+          playerCharacter.isAttackingLower = false;
+          console.log('Lower attack detected by enemy');
+      }
+  
 
     requestAnimationFrame(startAnimation);
     

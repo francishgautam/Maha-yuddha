@@ -4,10 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Maha yuddha</title>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+
+    <div class="game-container">
+      //Health and power up bar for player
+      <div class="stats">
+        <div class="stats__health-bar"></div>
+        <div class="stats__power-bar"></div>
+      </div>
+
+      //Health and power up for enemy
+      <div class="stats">
+        <div class="stathealth-bar"></div>
+        <div class="power-bar"></div>
+      </div>
+
+      <canvas id="canvas"></canvas>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
