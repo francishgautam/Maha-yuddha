@@ -46,6 +46,65 @@ let lastKey : string | null = '';
 class CreateCharacter {
 
     position : Position;
+    height : number;
+    width : number;
+    imageSrc : string;
+    image : any;
+    scale : number;
+    framesMax : number;
+    frameCurrent = 0;
+    // image : CanvasImageSource;
+    // imageSrc : CanvasImageSource;
+    constructor(position : Position, imageSrc : string, scale = 1, framesMax = 1){
+        this.position = position
+        this.height = 100
+        this.width = 50
+        this.imageSrc = imageSrc
+        this.scale = scale
+        this.framesMax = framesMax
+        this.image = new Image();
+        this.image.src = imageSrc;
+        this.frameCurrent = 0;
+    }
+
+    // Character creation function
+    drawCharacter(){
+        ctx.drawImage(
+            this.image, 
+            this.frameCurrent * (this.image.width/this.framesMax),  // This is for the crop from the top left position of the image in x-direction
+            0,                                  // This will crop in the y direction from the top
+            this.image.width/this.framesMax,    // framesMax is the value of total images in the sprite ( I am using linear sprite )
+            this.image.height,                  //
+
+            this.position.x,
+            this.position.y,
+            (this.image.width/this.framesMax) * this.scale, 
+            this.image.height* this.scale
+        );
+    }
+
+    //Attack creation function
+    drawAttackUpper(){
+       
+    }
+    drawAttackLower(){
+      
+    }
+
+    update(){
+        this.drawCharacter();
+        if(this.frameCurrent < this.framesMax){
+            this.frameCurrent++;
+        }
+        else{
+            this.frameCurrent = 0;
+        }
+    }
+}
+
+class Character {
+
+    position : Position;
     velocity : Velocity;
     height : number;
     width : number;
@@ -78,15 +137,12 @@ class CreateCharacter {
         this.health = 100;
         this.power = 0;
     }
+    
 
     // Character creation function
     drawCharacter(){
         ctx.fillStyle = this.sprite;
         ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-
-        //Attack box
-        ctx.fillStyle = 'red';
-        ctx.fillRect(this.attackRange.position.x,this.attackRange.position.y,this.attackRange.width,this.attackRange.height);
 
         // if(this.isAttackingUpper == true){
         //     this.drawAttackUpper();
@@ -117,7 +173,7 @@ class CreateCharacter {
         this.attackRange.position.y = this.position.y;
 
         this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        this.position.y += this.velocity.y ;
 
         if (this.position.y + this.height >= canvas.height) {
             this.position.y = canvas.height - this.height; 
@@ -126,7 +182,6 @@ class CreateCharacter {
             this.velocity.y += gravity;
         }
     }
-
 
     attackingUpper(){
         this.isAttackingUpper = true;
@@ -142,7 +197,17 @@ class CreateCharacter {
     }
 }
 
-const playerCharacter = new CreateCharacter(
+const background = new CreateCharacter(
+    {
+        x : -400,
+        y : -100
+    },
+    '/pokhara.jpg',
+    1,
+    1
+)
+
+const playerCharacter = new Character(
     {
         x : 200,
         y : 0
@@ -158,7 +223,7 @@ const playerCharacter = new CreateCharacter(
     }
 );
 
-const enemyCharacter = new CreateCharacter(
+const enemyCharacter = new Character(
     {
         x : 700,
         y : 0,
@@ -207,9 +272,9 @@ function declareWinner(){
 }
 
 
-
 function startAnimation(){
     ctx.clearRect(0,0, canvas.width, canvas.height);
+    background.update();   
     playerCharacter.update();
     enemyCharacter.update();
 
@@ -240,7 +305,6 @@ function startAnimation(){
     ) {
         playerCharacter.isAttackingUpper = false;
 
-
         //Decrease the health bar of enemy for upper attack by player 
         let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
         enemyCharacter.health += -10;
@@ -258,7 +322,6 @@ function startAnimation(){
         upperAttackDetection({playerAttackRectangle : enemyCharacter, enemyAttackRectangle : playerCharacter}) && enemyCharacter.isAttackingUpper
       ) {
           playerCharacter.isAttackingUpper = false;
-
 
         //Decrease the health bar of player for upper attack by enemy
         let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
