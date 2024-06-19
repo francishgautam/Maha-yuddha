@@ -1,9 +1,13 @@
+import './style.css'
+
 const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
 const ctx : CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight-100;
+canvas.width = 1000;
+canvas.height = 460;
 const gravity = 0.1;
+
+let playGame : boolean = true;
 
 interface Position {
     x : number;
@@ -50,6 +54,8 @@ class CreateCharacter {
     attackRange : AttackRange;
     isAttackingUpper : boolean;
     isAttackingLower : boolean;
+    health : number;
+    power : number;
  
     constructor(position : Position, velocity : Velocity, sprite : string, changeDirection : ChangeDirection){
         this.position = position
@@ -69,6 +75,8 @@ class CreateCharacter {
         }
         this.isAttackingUpper = false;
         this.isAttackingLower = false;
+        this.health = 100;
+        this.power = 0;
     }
 
     // Character creation function
@@ -111,7 +119,6 @@ class CreateCharacter {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-
         if (this.position.y + this.height >= canvas.height) {
             this.position.y = canvas.height - this.height; 
             this.velocity.y = 0;
@@ -137,7 +144,7 @@ class CreateCharacter {
 
 const playerCharacter = new CreateCharacter(
     {
-        x : 0,
+        x : 200,
         y : 0
     },
     {
@@ -153,7 +160,7 @@ const playerCharacter = new CreateCharacter(
 
 const enemyCharacter = new CreateCharacter(
     {
-        x : 100,
+        x : 700,
         y : 0,
     },
     {
@@ -187,6 +194,19 @@ function lowerAttackDetection({playerAttackRectangle,enemyAttackRectangle}){
     )
 }
 
+function declareWinner(){
+    let winner = document.querySelector('.declareWinner') as HTMLElement;
+    if(playerCharacter.health <= 0){
+        winner.innerText = 'Enemy Wins ! Click to restart game'
+        playGame = false;
+
+    }else if(enemyCharacter.health <= 0){
+        winner.innerText = 'Player Wins ! Click to restart game'
+        playGame = false;
+    }
+}
+
+
 
 function startAnimation(){
     ctx.clearRect(0,0, canvas.width, canvas.height);
@@ -213,11 +233,24 @@ function startAnimation(){
         enemyCharacter.position.x += 5;
     }
 
-    // Collision detection for upper attack
+    // Collision detection for upper attack............................
+
     if (
       upperAttackDetection({playerAttackRectangle : playerCharacter, enemyAttackRectangle : enemyCharacter}) && playerCharacter.isAttackingUpper
     ) {
         playerCharacter.isAttackingUpper = false;
+
+
+        //Decrease the health bar of enemy for upper attack by player 
+        let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
+        enemyCharacter.health += -10;
+        enemyHealthBar.style.width = enemyCharacter.health + '%';
+
+        // //Increase the power up bar
+        // let playerPowerUpBar = document.querySelector('.stats__power-bar--player') as HTMLElement;
+        // playerCharacter.power += 1;
+        // playerPowerUpBar.style.width = playerCharacter.health + '%';
+        
         console.log('Upper attack detected by player');
     }
 
@@ -225,14 +258,28 @@ function startAnimation(){
         upperAttackDetection({playerAttackRectangle : enemyCharacter, enemyAttackRectangle : playerCharacter}) && enemyCharacter.isAttackingUpper
       ) {
           playerCharacter.isAttackingUpper = false;
-          console.log('Upper attack detected by wnwmy');
+
+
+        //Decrease the health bar of player for upper attack by enemy
+        let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
+        playerCharacter.health += -3;
+        playerHealthBar.style.width = playerCharacter.health + '%';
+
+        console.log('Upper attack detected by enemy');
       }
 
-    // Collision detection for lower attack
+    // Collision detection for lower attack...........................
+
     if (
       lowerAttackDetection({playerAttackRectangle: playerCharacter,enemyAttackRectangle : enemyCharacter}) && playerCharacter.isAttackingLower
     ) {
         playerCharacter.isAttackingLower = false;
+
+        //Decrease the health bar for lower attack by player
+        let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
+        enemyCharacter.health += -10;
+        enemyHealthBar.style.width = enemyCharacter.health + '%';
+
         console.log('Lower attack detected by player');
     }
 
@@ -240,19 +287,26 @@ function startAnimation(){
         lowerAttackDetection({playerAttackRectangle: enemyCharacter,enemyAttackRectangle : playerCharacter}) && enemyCharacter.isAttackingLower
       ) {
           playerCharacter.isAttackingLower = false;
+
+        //Decrease the health bar for lower attack by enemy
+        let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
+        playerCharacter.health += -3;
+        playerHealthBar.style.width = playerCharacter.health + '%';
           console.log('Lower attack detected by enemy');
       }
-  
-
-    requestAnimationFrame(startAnimation);
     
+    // Declare winner...........................................
+    declareWinner();
+
+
+    if(playGame){
+        requestAnimationFrame(startAnimation);
+      }
 }
 
 startAnimation();
 
 // Adding event listeners
-
-
 window.addEventListener('keydown', (event) => {
     switch(event.key){
         case 'a':
@@ -276,6 +330,8 @@ window.addEventListener('keydown', (event) => {
         case 's':
             playerCharacter.crouch();
             break;
+
+// Event listener for enemy player
 
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true;

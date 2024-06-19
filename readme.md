@@ -30,3 +30,7 @@ The project aims to develop a simple 2D fighting game using HTML canvas, CSS for
 4. Open your browser and navigate to `http://localhost:5173`.
 
 Enjoy playing Maha Yuddha!
+
+//Bugs 
+
+for some reason enemy attacks are more effective than player attack

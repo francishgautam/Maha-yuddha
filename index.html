@@ -3,24 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
     <title>Maha yuddha</title>
   </head>
   <body>
 
     <div class="game-container">
-      //Health and power up bar for player
-      <div class="stats">
-        <div class="stats__health-bar"></div>
-        <div class="stats__power-bar"></div>
+      
+      <div class="declareWinner"></div>
+      <div class="stats-block">
+        <!-- //Health and power up bar for player -->
+        <div class="stats">
+          <div class="stats__health-bar--player">Player health bar</div>
+          <div class="stats__power-bar--player">Player power up bar</div>
+        </div>
+  
+        <!-- //Health and power up for enemy -->
+        <div class="stats">
+          <div class="stats__health-bar--enemy">Enemy health bar</div>
+          <div class="stats__power-bar--enemy">Enemy power up bar</div>
+        </div>
       </div>
-
-      //Health and power up for enemy
-      <div class="stats">
-        <div class="stathealth-bar"></div>
-        <div class="power-bar"></div>
-      </div>
-
       <canvas id="canvas"></canvas>
     </div>
     <script type="module" src="/src/main.ts"></script>

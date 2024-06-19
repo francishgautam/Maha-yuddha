@@ -1,8 +1,52 @@
 .game-container{
-    
-}
-
-.stats{
     display: flex;
     flex-direction: column;
+    position: relative;
+    background-image: url('pokhara.jpg');
+    background-size: cover;
+}
+
+.stats-block{
+    display: flex;
+    gap: 100%;
+    position: absolute;
+    
+    /* margin-left: 20%; */
+}
+.stats{
+    display: flex;
+    min-width: 300px;
+    flex-direction: column;
+    gap: 3px;
+    margin: 30px;
+}
+.stats__health-bar--player{
+    background-color: lightgreen;
+    height: 50px;
+    border-radius: 50px;
+    width: 300px;
+}
+.stats__power-bar--player{
+    background-color: yellow;
+    height: 10px;
+    border-radius: 10px;
+    width: 0px;
+}
+.stats__health-bar--enemy{
+    background-color: lightgreen;
+    height: 50px;
+    border-radius: 50px;
+    width: 300px;
+}
+.stats__power-bar--enemy{
+    background-color: yellow;
+    height: 10px;
+    border-radius: 10px;
+    width: 0px;
+}
+
+.declareWinner{
+    position: absolute;
+    top: 300px;
+    left: 600px;
 }
