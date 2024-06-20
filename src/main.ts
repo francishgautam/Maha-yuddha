@@ -19,7 +19,7 @@ interface Velocity {
     y : number;
 }
 
-interface ChangeDirection {
+interface CorrectCropParameters {
     x : number;
     y : number;
 }
@@ -28,7 +28,7 @@ interface AttackRange {
     position : Position;
     width : number;
     height : number;
-    changeDirection : ChangeDirection;
+    correctCropParameters : CorrectCropParameters;
 }
 
 const keys  = {
@@ -52,10 +52,13 @@ class CreateCharacter {
     image : any;
     scale : number;
     framesMax : number;
-    frameCurrent = 0;
+    framesCurrent : number;
+    framesElapsed : number;
+    framesHold : number;
     // image : CanvasImageSource;
     // imageSrc : CanvasImageSource;
-    constructor(position : Position, imageSrc : string, scale = 1, framesMax = 1){
+    correctCropParameters : object;
+    constructor(position : Position, imageSrc : string, scale = 1, framesMax = 1, correctCropParameters : object){
         this.position = position
         this.height = 100
         this.width = 50
@@ -64,14 +67,19 @@ class CreateCharacter {
         this.framesMax = framesMax
         this.image = new Image();
         this.image.src = imageSrc;
-        this.frameCurrent = 0;
+
+        this.framesCurrent = 0;
+        this.framesElapsed = 0;
+        this.framesHold = 0;
+
+        this.correctCropParameters = correctCropParameters;
     }
 
     // Character creation function
     drawCharacter(){
         ctx.drawImage(
             this.image, 
-            this.frameCurrent * (this.image.width/this.framesMax),  // This is for the crop from the top left position of the image in x-direction
+            this.framesCurrent * (this.image.width/this.framesMax),  // This is for the crop from the top left position of the image in x-direction
             0,                                  // This will crop in the y direction from the top
             this.image.width/this.framesMax,    // framesMax is the value of total images in the sprite ( I am using linear sprite )
             this.image.height,                  //
@@ -93,83 +101,83 @@ class CreateCharacter {
 
     update(){
         this.drawCharacter();
-        if(this.frameCurrent < this.framesMax){
-            this.frameCurrent++;
+
+        this.framesElapsed++;
+        //Update animation frame
+        if(this.framesElapsed % this.framesHold === 0){
+            if(this.framesCurrent < this.framesMax -1 )   // -1 because the first frame starts at zero
+        {   
+            this.framesCurrent++;
         }
         else{
-            this.frameCurrent = 0;
+            this.framesCurrent = 0;
+        }
         }
     }
 }
 
-class Character {
+class Character extends CreateCharacter{
 
-    position : Position;
     velocity : Velocity;
     height : number;
     width : number;
     sprite : string;
-    changeDirection : ChangeDirection;
     attackRange : AttackRange;
     isAttackingUpper : boolean;
     isAttackingLower : boolean;
     health : number;
     power : number;
+    correctCropParameters: CorrectCropParameters;
  
-    constructor(position : Position, velocity : Velocity, sprite : string, changeDirection : ChangeDirection){
-        this.position = position
+    constructor(position : Position, velocity : Velocity, sprite : string, imageSrc : string, scale = 1, framesMax = 1,correctCropParameters : CorrectCropParameters ){
+       
+        super(
+            position,imageSrc,scale,framesMax, correctCropParameters
+        );
+
         this.velocity = velocity
         this.height = 100
-        this.width = 50
+        this.width = 50,
         this.sprite = sprite
-        this.changeDirection = changeDirection
         this.attackRange = {
             position : {
                 x : this.position.x,
                 y : this.position.y
             },
-            changeDirection,
             width : 100,
-            height : 10
+            height : 10,
+            correctCropParameters : {
+                x : 0,
+                y : 0
+            }
         }
         this.isAttackingUpper = false;
         this.isAttackingLower = false;
         this.health = 100;
         this.power = 0;
-    }
-    
-
-    // Character creation function
-    drawCharacter(){
-        ctx.fillStyle = this.sprite;
-        ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-
-        // if(this.isAttackingUpper == true){
-        //     this.drawAttackUpper();
-        // }
-        // if(this.isAttackingLower == true){
-        //     this.drawAttackLower();
-        // }
-    }
-
-    //Attack creation function
-    drawAttackUpper(){
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(this.position.x,this.position.y,this.attackRange.width,this.attackRange.height);
-    }
-    drawAttackLower(){
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(this.position.x,this.position.y+playerCharacter.height-10,this.attackRange.width,this.attackRange.height);
-    }
-
-    crouch(){
-
+        this.framesCurrent = 0;
+        this.framesElapsed = 0;
+        this.framesHold = 0;
+        this.correctCropParameters = correctCropParameters;
     }
 
     update(){
         this.drawCharacter();
 
-        this.attackRange.position.x = this.position.x + this.attackRange.changeDirection.x;
+        
+        this.framesElapsed++;
+        //Update animation frame
+        if(this.framesElapsed % this.framesHold === 0){
+            if(this.framesCurrent < this.framesMax -1 )   // -1 because the first frame starts at zero
+        {   
+            this.framesCurrent++;
+        }
+        else{
+            this.framesCurrent = 0;
+        }
+        }
+
+        this.attackRange.position.x = this.position.x + this.attackRange.correctCropParameters.x;
         this.attackRange.position.y = this.position.y;
 
         this.position.x += this.velocity.x;
@@ -204,7 +212,8 @@ const background = new CreateCharacter(
     },
     '/pokhara.jpg',
     1,
-    1
+    1,
+    {x:0,y:0}
 )
 
 const playerCharacter = new Character(
@@ -217,10 +226,10 @@ const playerCharacter = new Character(
         y : 0
     },
     'gray',
-    {
-        x : 0,
-        y : 0
-    }
+    '/samurai/idle.png',
+    3,
+    3,
+    {x:215,y:180}
 );
 
 const enemyCharacter = new Character(
@@ -233,10 +242,10 @@ const enemyCharacter = new Character(
         y : 0
     },
     'purple',
-    {
-        x : -50,
-        y : 0
-    }
+    '/samurai/idle.png',
+    3,
+    3,
+    {x:215,y:180}
 );
 
 function upperAttackDetection({playerAttackRectangle,enemyAttackRectangle}){
@@ -270,7 +279,6 @@ function declareWinner(){
         playGame = false;
     }
 }
-
 
 function startAnimation(){
     ctx.clearRect(0,0, canvas.width, canvas.height);

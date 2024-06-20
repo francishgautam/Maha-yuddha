@@ -34,3 +34,4 @@ Enjoy playing Maha Yuddha!
 //Bugs 
 
 for some reason enemy attacks are more effective than player attack
+make sure you offset every image 
