@@ -43,10 +43,9 @@ const keys = {
     s: { pressed: false },
     ArrowLeft: { pressed: false },
     ArrowRight: { pressed: false },
-    ArrowUp: { pressed: false }
+    ArrowUp: { pressed: false },
+    ArrowDown : { pressed : false}
 };
-
-let LastKey: string | null = '';
 
 class CreateCharacter {
     position: Position;
@@ -127,6 +126,7 @@ class Character extends CreateCharacter {
     pushEffect: number;
     isJumping: boolean;
     powerIncrement: number;
+    crouching : boolean;
 
     constructor(
         position: Position,
@@ -169,6 +169,7 @@ class Character extends CreateCharacter {
         this.pushEffect = 100;
         this.isJumping = false;
         this.powerIncrement = 10;
+        this.crouching = false;
     }
 
     attackingUpper() {
@@ -302,6 +303,7 @@ const enemyCharacter = new Character(
 
 function upperAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
     return (
+        !enemyAttackRectangle.crouching &&
         playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
         playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
         playerAttackRectangle.attackRange.position.y + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
@@ -425,18 +427,15 @@ window.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'a':
             keys.a.pressed = true;
-            LastKey = 'a';
             break;
         case 'd':
             keys.d.pressed = true;
-            LastKey = 'd';
             break;
         case 'w':
             if (!playerCharacter.isJumping) {
                 playerCharacter.velocity.y = -5;
                 playerCharacter.isJumping = true;
             }
-            LastKey = 'w';
             break;
         case 't':
             playerCharacter.attackingUpper();
@@ -445,24 +444,21 @@ window.addEventListener('keydown', (event) => {
             playerCharacter.attackingLower();
             break;
         case 's':
-            //playerCharacter.crouch();
+            playerCharacter.crouching = true;
             break;
 
         // Event listener for enemy player
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true;
-            LastKey = 'ArrowLeft';
             break;
         case 'ArrowRight':
             keys.ArrowRight.pressed = true;
-            LastKey = 'ArrowRight';
             break;
         case 'ArrowUp':
             if (!enemyCharacter.isJumping) {
                 enemyCharacter.velocity.y = -5;
                 enemyCharacter.isJumping = true;
             }
-            LastKey = 'ArrowUp';
             break;
         case 'k':
             enemyCharacter.attackingUpper();
@@ -471,7 +467,7 @@ window.addEventListener('keydown', (event) => {
             enemyCharacter.attackingLower();
             break;
         case 'ArrowDown':
-            //enemyCharacter.crouch();
+            enemyCharacter.crouching = true;
             break;
     }
     console.log(event.key);
@@ -488,6 +484,9 @@ window.addEventListener('keyup', (event) => {
         case 'w':
             keys.w.pressed = false;
             break;
+        case 's':
+            playerCharacter.crouching = false;
+            break;
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = false;
             break;
@@ -497,5 +496,7 @@ window.addEventListener('keyup', (event) => {
         case 'ArrowUp':
             keys.ArrowUp.pressed = false;
             break;
+        case 'ArrowDown':
+            enemyCharacter.crouching = false;
     }
 });
