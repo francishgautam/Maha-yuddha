@@ -251,7 +251,7 @@ const background = new CreateCharacter(
 const playerCharacter = new Character(
     {
         x: 200,
-        y: 0
+        y: 700
     },
     {
         x: 0,
@@ -277,7 +277,7 @@ const playerCharacter = new Character(
 const enemyCharacter = new Character(
     {
         x: 700,
-        y: 0
+        y: 700
     },
     {
         x: 0,
@@ -328,6 +328,16 @@ function declareWinner() {
     } else if (enemyCharacter.health <= 0) {
         winner.innerText = 'Player Wins! Click to restart game';
         playGame = false;
+    }
+}
+
+function checkCentralCrossing() {
+    if (playerCharacter.position.x < 40 || playerCharacter.position.x > 800) {
+        enemyCharacter.health = 0;
+        declareWinner();
+    } else if (enemyCharacter.position.x < 40 || enemyCharacter.position.x > 900) {
+        playerCharacter.health = 0;
+        declareWinner();
     }
 }
 
@@ -399,7 +409,9 @@ function startAnimation() {
         console.log('Lower attack detected by enemy');
     }
 
+    checkCentralCrossing();
     declareWinner();
+
 
     if (playGame) {
         requestAnimationFrame(startAnimation);

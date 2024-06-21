@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    /* display: none; */
     /* background-image: url('pokhara.jpg'); */
     /* background-size: cover; */
 }
@@ -50,3 +51,49 @@
     top: 300px;
     left: 600px;
 }
+
+
+/* Start game screen  styling*/
+
+.character-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .character-options {
+    display: flex;
+    justify-content: space-around;
+    width: 80%;
+    margin: 20px 0;
+  }
+  .character {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 10px;
+  }
+  .character.selected {
+    border-color: #000;
+  }
+  .start-game {
+    margin-top: 20px;
+  }
+
+  .background-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .background-options {
+    display: flex;
+    justify-content: space-around;
+    width: 80%;
+    margin: 20px 0;
+  }
+  .background {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 10px;
+  }
+  .background.selected {
+    border-color: #000;
+  }
