@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    /* display: none; */
     /* background-image: url('pokhara.jpg'); */
     /* background-size: cover; */
 }
@@ -22,25 +21,25 @@
     margin: 30px;
 }
 .stats__health-bar--player{
-    background-color: lightgreen;
+    background-color: gray;
     height: 50px;
     border-radius: 50px;
     width: 300px;
 }
 .stats__power-bar--player{
-    background-color: yellow;
+    background-color: darkred;
     height: 10px;
     border-radius: 10px;
     width: 0px;
 }
 .stats__health-bar--enemy{
-    background-color: lightgreen;
+    background-color: gray;
     height: 50px;
     border-radius: 50px;
     width: 300px;
 }
 .stats__power-bar--enemy{
-    background-color: yellow;
+    background-color: darkred;
     height: 10px;
     border-radius: 10px;
     width: 0px;
@@ -78,11 +77,6 @@
     margin-top: 20px;
   }
 
-  .background-selection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
   .background-options {
     display: flex;
     justify-content: space-around;
@@ -97,3 +91,18 @@
   .background.selected {
     border-color: #000;
   }
+
+  /* Screen layer */
+
+  .character-selection{
+    display: none;
+  }
+
+  .background-selection{
+    display: none;
+  }
+
+  .difficuilty-selection{
+    display: none;
+  }
+

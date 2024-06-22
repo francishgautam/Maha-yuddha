@@ -24,16 +24,20 @@ interface CorrectCropParameters {
     y: number;
 }
 
+interface Sprite {
+    imageSrc: string;
+    framesMax: number;
+    scale: number;
+    correctCropParameters: CorrectCropParameters;
+    image: HTMLImageElement;
+    imageLoaded: boolean;
+}
+
 interface AttackRange {
     position: Position;
     width: number;
     height: number;
     correctCropParameters: CorrectCropParameters;
-}
-
-interface Skin {
-    imageSrc: string;
-    framesMax: number;
 }
 
 const keys = {
@@ -44,7 +48,7 @@ const keys = {
     ArrowLeft: { pressed: false },
     ArrowRight: { pressed: false },
     ArrowUp: { pressed: false },
-    ArrowDown : { pressed : false}
+    ArrowDown: { pressed: false }
 };
 
 class CreateCharacter {
@@ -60,6 +64,7 @@ class CreateCharacter {
     framesHold: number;
     correctCropParameters: CorrectCropParameters;
     facingRight: boolean;
+    imageLoaded: boolean;
 
     constructor(position: Position, imageSrc: string, scale = 1, framesMax = 1, correctCropParameters: CorrectCropParameters) {
         this.position = position;
@@ -75,9 +80,15 @@ class CreateCharacter {
         this.framesHold = 10;  // Adjust this value to control the frame rate
         this.correctCropParameters = correctCropParameters;
         this.facingRight = true;
+        this.imageLoaded = false;
+        this.image.onload = () => {
+            this.imageLoaded = true;
+        };
     }
 
     drawCharacter() {
+        if (!this.image.complete) return;  // Check if the image is loaded before drawing
+
         ctx.save();
         if (!this.facingRight) {
             ctx.scale(-1, 1);
@@ -120,25 +131,24 @@ class Character extends CreateCharacter {
     isAttackingLower: boolean;
     health: number;
     power: number;
-    skins: Skin;
     attackUpperDamage: number;
     attackLowerDamage: number;
     pushEffect: number;
     isJumping: boolean;
     powerIncrement: number;
-    crouching : boolean;
+    blocking: boolean;
+    sprites: Record<string, Sprite>;
+    currentAction: string;
+    canAttackUpper: boolean;
+    canAttackLower: boolean;
 
     constructor(
         position: Position,
         velocity: Velocity,
         sprite: string,
-        imageSrc: string,
-        scale = 1,
-        framesMax = 1,
-        correctCropParameters: CorrectCropParameters,
-        skins: { [key: string]: Skin }
+        sprites: Record<string, Sprite>
     ) {
-        super(position, imageSrc, scale, framesMax, correctCropParameters);
+        super(position, sprites.idle.imageSrc, sprites.idle.scale, sprites.idle.framesMax, sprites.idle.correctCropParameters);
         this.velocity = velocity;
         this.height = 100;
         this.width = 50;
@@ -159,31 +169,65 @@ class Character extends CreateCharacter {
         this.isAttackingLower = false;
         this.health = 100;
         this.power = 0;
-        this.framesMax = framesMax;
-        this.framesCurrent = 0;
-        this.framesElapsed = 0;
-        this.framesHold = 10;
-        this.skins = { imageSrc: '', framesMax: 0 };
         this.attackUpperDamage = 5;
         this.attackLowerDamage = 10;
         this.pushEffect = 100;
         this.isJumping = false;
         this.powerIncrement = 10;
-        this.crouching = false;
+        this.blocking = false;
+        this.sprites = sprites;
+        this.currentAction = 'idle';
+        this.canAttackUpper = true;  // Flag for upper attack cooldown
+        this.canAttackLower = true;  // Flag for lower attack cooldown
+        for (const action in sprites) {
+            const sprite = sprites[action];
+            sprite.image = new Image();
+            sprite.image.src = sprite.imageSrc;
+            sprite.imageLoaded = false;
+            sprite.image.onload = () => {
+                sprite.imageLoaded = true;
+            };
+        }
+    }
+
+    setAction(action: string) {
+        if (this.currentAction === action) return;
+        this.currentAction = action;
+        const sprite = this.sprites[action];
+        this.image = sprite.image;
+        this.scale = sprite.scale;
+        this.framesMax = sprite.framesMax;
+        this.correctCropParameters = sprite.correctCropParameters;
+        this.framesCurrent = 0;
+        this.framesElapsed = 0;
     }
 
     attackingUpper() {
+        if (!this.canAttackUpper) return;  // Prevent attacking if in cooldown
+        this.canAttackUpper = false;  // Start cooldown
+        this.setAction('attackUpper');
         this.isAttackingUpper = true;
         setTimeout(() => {
             this.isAttackingUpper = false;
-        }, 100);
+            if (this.currentAction === 'attackUpper') this.setAction('idle');
+        }, 800); // Increased duration for attack animation
+        setTimeout(() => {
+            this.canAttackUpper = true;  // Reset cooldown after 5 seconds
+        }, 5000);
     }
 
     attackingLower() {
+        if (!this.canAttackLower) return;  // Prevent attacking if in cooldown
+        this.canAttackLower = false;  // Start cooldown
+        this.setAction('attackLower');
         this.isAttackingLower = true;
         setTimeout(() => {
             this.isAttackingLower = false;
-        }, 100);
+            if (this.currentAction === 'attackLower') this.setAction('idle');
+        }, 800); // Increased duration for attack animation
+        setTimeout(() => {
+            this.canAttackLower = true;  // Reset cooldown after 3 seconds
+        }, 3000);
     }
 
     applyUpperAttack(enemy: Character) {
@@ -234,6 +278,9 @@ class Character extends CreateCharacter {
             this.isJumping = false;
         } else {
             this.velocity.y += gravity;
+            if (this.isJumping) {
+                this.setAction('jump');
+            }
         }
     }
 }
@@ -248,6 +295,26 @@ const background = new CreateCharacter(
     1,
     { x: 0, y: 0 }
 );
+const fireLeft = new CreateCharacter(
+    {
+        x: -30,
+        y: 100
+    },
+    '/fire.png',
+    15,
+    6,
+    { x: 0, y: 0 }
+);
+const fireRight = new CreateCharacter(
+    {
+        x: 800,
+        y: 100
+    },
+    '/fire.png',
+    15,
+    6,
+    { x: 0, y: 0 }
+);
 
 const playerCharacter = new Character(
     {
@@ -259,18 +326,46 @@ const playerCharacter = new Character(
         y: 0
     },
     'gray',
-    '/samurai/idle.png',
-    3.7,
-    3,
-    { x: 0, y: 0 },
     {
         idle: {
-            imageSrc: '/samurai/idle.png',
-            framesMax: 3
+            imageSrc: '/zoro/idle.png',
+            scale: 0.5,
+            framesMax: 3,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
         },
         run: {
-            imageSrc: '/samurai/run-sword.png',
-            framesMax: 12
+            imageSrc: '/zoro/running.png',
+            scale: 0.5,
+            framesMax: 1,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        jump: {
+            imageSrc: '/zoro/jumping.png',
+            scale: 0.5,
+            framesMax: 1,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        attackUpper: {
+            imageSrc: '/zoro/lightAttack.png',
+            scale: 0.5,
+            framesMax: 1,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        attackLower: {
+            imageSrc: '/zoro/heavyAttack.png',
+            scale: 0.5,
+            framesMax: 4,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
         }
     }
 );
@@ -282,28 +377,56 @@ const enemyCharacter = new Character(
     },
     {
         x: 0,
-        y: 200
+        y: 0
     },
     'purple',
-    '/samurai/idle.png',
-    3.7,
-    3,
-    { x: 0, y: 0 },
     {
         idle: {
-            imageSrc: '/samurai/idle.png',
-            framesMax: 3
+            imageSrc: '/luffy/idle.png',
+            scale: 1,
+            framesMax: 3,
+            correctCropParameters: { x: 0, y: 100 },
+            image: new Image(),
+            imageLoaded: false
         },
         run: {
             imageSrc: '/samurai/run-sword.png',
-            framesMax: 12
+            scale: 3.7,
+            framesMax: 10,
+            correctCropParameters: { x: 0, y: 40 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        jump: {
+            imageSrc: '/samurai/run.png',
+            scale: 3.7,
+            framesMax: 2,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        attackUpper: {
+            imageSrc: '/samurai/run.png',
+            scale: 3.7,
+            framesMax: 6,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        attackLower: {
+            imageSrc: '/samurai/run.png',
+            scale: 3.7,
+            framesMax: 6,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
         }
     }
 );
 
 function upperAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
     return (
-        !enemyAttackRectangle.crouching &&
+        !enemyAttackRectangle.blocking &&
         playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
         playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
         playerAttackRectangle.attackRange.position.y + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
@@ -314,6 +437,7 @@ function upperAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: {
 
 function lowerAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
     return (
+        !enemyAttackRectangle.blocking &&
         playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
         playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
         playerAttackRectangle.attackRange.position.y + playerAttackRectangle.height - playerAttackRectangle.attackRange.height + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
@@ -322,6 +446,7 @@ function lowerAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: {
     );
 }
 
+// Function to check health
 function declareWinner() {
     let winner = document.querySelector('.declareWinner') as HTMLElement;
     if (playerCharacter.health <= 0) {
@@ -333,19 +458,21 @@ function declareWinner() {
     }
 }
 
+// Function for boundary crossing 
 function checkCentralCrossing() {
-    if (playerCharacter.position.x < 40 || playerCharacter.position.x > 800) {
-        enemyCharacter.health = 0;
-        declareWinner();
-    } else if (enemyCharacter.position.x < 40 || enemyCharacter.position.x > 900) {
+    if (playerCharacter.position.x < 40 || playerCharacter.position.x > 800 && playerCharacter.position.y) {
         playerCharacter.health = 0;
-        declareWinner();
+    } else if (enemyCharacter.position.x < 40 || enemyCharacter.position.x > 900) {
+        enemyCharacter.health = 0;
     }
 }
 
+// Start animation loop
 function startAnimation() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     background.update();
+    fireLeft.update();
+    fireRight.update();
     playerCharacter.update();
     enemyCharacter.update();
 
@@ -355,8 +482,10 @@ function startAnimation() {
     // Adding booleans for update of keys
     if (keys.a.pressed) {
         playerCharacter.position.x += -5;
+        playerCharacter.setAction('run');
     } else if (keys.d.pressed) {
         playerCharacter.position.x += 5;
+        playerCharacter.setAction('run');
     } else if (keys.w.pressed && !playerCharacter.isJumping) {
         playerCharacter.velocity.y = -5;
         playerCharacter.isJumping = true;
@@ -365,8 +494,17 @@ function startAnimation() {
         enemyCharacter.isJumping = true;
     } else if (keys.ArrowLeft.pressed) {
         enemyCharacter.position.x += -5;
+        enemyCharacter.setAction('run');
     } else if (keys.ArrowRight.pressed) {
         enemyCharacter.position.x += 5;
+        enemyCharacter.setAction('run');
+    } else {
+        if (!playerCharacter.isAttackingUpper && !playerCharacter.isAttackingLower && !playerCharacter.isJumping) {
+            playerCharacter.setAction('idle');
+        }
+        if (!enemyCharacter.isAttackingUpper && !enemyCharacter.isAttackingLower && !enemyCharacter.isJumping) {
+            enemyCharacter.setAction('idle');
+        }
     }
 
     // Collision detection for upper attack
@@ -414,7 +552,6 @@ function startAnimation() {
     checkCentralCrossing();
     declareWinner();
 
-
     if (playGame) {
         requestAnimationFrame(startAnimation);
     }
@@ -444,7 +581,7 @@ window.addEventListener('keydown', (event) => {
             playerCharacter.attackingLower();
             break;
         case 's':
-            playerCharacter.crouching = true;
+            playerCharacter.blocking = true;
             break;
 
         // Event listener for enemy player
@@ -467,7 +604,7 @@ window.addEventListener('keydown', (event) => {
             enemyCharacter.attackingLower();
             break;
         case 'ArrowDown':
-            enemyCharacter.crouching = true;
+            enemyCharacter.blocking = true;
             break;
     }
     console.log(event.key);
@@ -485,7 +622,7 @@ window.addEventListener('keyup', (event) => {
             keys.w.pressed = false;
             break;
         case 's':
-            playerCharacter.crouching = false;
+            playerCharacter.blocking = false;
             break;
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = false;
@@ -497,6 +634,6 @@ window.addEventListener('keyup', (event) => {
             keys.ArrowUp.pressed = false;
             break;
         case 'ArrowDown':
-            enemyCharacter.crouching = false;
+            enemyCharacter.blocking = false;
     }
 });
