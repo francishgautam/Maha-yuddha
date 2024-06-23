@@ -171,7 +171,7 @@ class Character extends CreateCharacter {
         this.power = 0;
         this.attackUpperDamage = 5;
         this.attackLowerDamage = 10;
-        this.pushEffect = 100;
+        this.pushEffect = 200;
         this.isJumping = false;
         this.powerIncrement = 10;
         this.blocking = false;
@@ -366,6 +366,14 @@ const playerCharacter = new Character(
             correctCropParameters: { x: 0, y: 0 },
             image: new Image(),
             imageLoaded: false
+        },
+        block : {
+            imageSrc: '/zoro/blocking.png',
+            scale: 0.6,
+            framesMax: 2,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
         }
     }
 );
@@ -382,41 +390,49 @@ const enemyCharacter = new Character(
     'purple',
     {
         idle: {
-            imageSrc: '/luffy/idle.png',
-            scale: 1,
-            framesMax: 3,
-            correctCropParameters: { x: 0, y: 100 },
+            imageSrc: '/afro-luffy/idle.png',
+            scale: 0.6,
+            framesMax: 2,
+            correctCropParameters: { x: 0, y: 20 },
             image: new Image(),
             imageLoaded: false
         },
         run: {
-            imageSrc: '/samurai/run-sword.png',
-            scale: 3.7,
-            framesMax: 10,
-            correctCropParameters: { x: 0, y: 40 },
+            imageSrc: '/afro-luffy/running.png',
+            scale: 0.6,
+            framesMax: 1,
+            correctCropParameters: { x: 0, y: 0 },
             image: new Image(),
             imageLoaded: false
         },
         jump: {
-            imageSrc: '/samurai/run.png',
-            scale: 3.7,
-            framesMax: 2,
+            imageSrc: '/afro-luffy/jumping.png',
+            scale: 0.6,
+            framesMax: 1,
             correctCropParameters: { x: 0, y: 0 },
             image: new Image(),
             imageLoaded: false
         },
         attackUpper: {
-            imageSrc: '/samurai/run.png',
-            scale: 3.7,
-            framesMax: 6,
+            imageSrc: '/afro-luffy/heavyAttack.png',
+            scale: 0.6,
+            framesMax: 3,
             correctCropParameters: { x: 0, y: 0 },
             image: new Image(),
             imageLoaded: false
         },
         attackLower: {
-            imageSrc: '/samurai/run.png',
-            scale: 3.7,
-            framesMax: 6,
+            imageSrc: '/afro-luffy/lightAttack.png',
+            scale: 0.6,
+            framesMax: 1,
+            correctCropParameters: { x: 0, y: 0 },
+            image: new Image(),
+            imageLoaded: false
+        },
+        block : {
+            imageSrc: '/afro-luffy/blocking.png',
+            scale: 0.6,
+            framesMax: 2,
             correctCropParameters: { x: 0, y: 0 },
             image: new Image(),
             imageLoaded: false
@@ -486,6 +502,8 @@ function startAnimation() {
     } else if (keys.d.pressed) {
         playerCharacter.position.x += 5;
         playerCharacter.setAction('run');
+    } else if (keys.ArrowDown.pressed) {
+        playerCharacter.setAction('block');
     } else if (keys.w.pressed && !playerCharacter.isJumping) {
         playerCharacter.velocity.y = -5;
         playerCharacter.isJumping = true;
@@ -498,6 +516,8 @@ function startAnimation() {
     } else if (keys.ArrowRight.pressed) {
         enemyCharacter.position.x += 5;
         enemyCharacter.setAction('run');
+    } else if (keys.ArrowDown.pressed) {
+        enemyCharacter.setAction('block');
     } else {
         if (!playerCharacter.isAttackingUpper && !playerCharacter.isAttackingLower && !playerCharacter.isJumping) {
             playerCharacter.setAction('idle');
@@ -547,6 +567,13 @@ function startAnimation() {
         let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
         playerHealthBar.style.width = playerCharacter.health + '%';
         console.log('Lower attack detected by enemy');
+    }
+
+    if(playerCharacter.blocking == true){
+        playerCharacter.setAction('block');
+    }
+    if(enemyCharacter.blocking == true){
+        enemyCharacter.setAction('block');
     }
 
     checkCentralCrossing();

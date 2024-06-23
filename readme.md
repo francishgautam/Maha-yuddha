@@ -33,5 +33,7 @@ Enjoy playing Maha Yuddha!
 
 //Bugs 
 
-for some reason enemy attacks are more effective than player attack
-make sure you offset every image 
+find and change sprites
+audio 
+character selection 
+attack animation while jumping --> disable
