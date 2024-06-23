@@ -5,7 +5,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRendering
 
 canvas.width = 1000;
 canvas.height = 460;
-const gravity = 0.2;
+const gravity = 0.4;
 
 let playGame: boolean = true;
 
@@ -173,7 +173,7 @@ class Character extends CreateCharacter {
         this.attackLowerDamage = 10;
         this.pushEffect = 200;
         this.isJumping = false;
-        this.powerIncrement = 10;
+        this.powerIncrement = 35;
         this.blocking = false;
         this.sprites = sprites;
         this.currentAction = 'idle';
@@ -496,24 +496,24 @@ function startAnimation() {
     enemyCharacter.facingRight = enemyCharacter.position.x < playerCharacter.position.x;
 
     // Adding booleans for update of keys
-    if (keys.a.pressed) {
+    if (keys.a.pressed && playerCharacter.blocking == false) {
         playerCharacter.position.x += -5;
         playerCharacter.setAction('run');
-    } else if (keys.d.pressed) {
+    } else if (keys.d.pressed && playerCharacter.blocking == false) {
         playerCharacter.position.x += 5;
         playerCharacter.setAction('run');
     } else if (keys.ArrowDown.pressed) {
         playerCharacter.setAction('block');
     } else if (keys.w.pressed && !playerCharacter.isJumping) {
-        playerCharacter.velocity.y = -5;
+        playerCharacter.velocity.y = -10;
         playerCharacter.isJumping = true;
     } else if (keys.ArrowUp.pressed && !enemyCharacter.isJumping) {
-        enemyCharacter.velocity.y = -5;
+        enemyCharacter.velocity.y = -10;
         enemyCharacter.isJumping = true;
-    } else if (keys.ArrowLeft.pressed) {
+    } else if (keys.ArrowLeft.pressed && enemyCharacter.blocking == false) {
         enemyCharacter.position.x += -5;
         enemyCharacter.setAction('run');
-    } else if (keys.ArrowRight.pressed) {
+    } else if (keys.ArrowRight.pressed && enemyCharacter.blocking == false) {
         enemyCharacter.position.x += 5;
         enemyCharacter.setAction('run');
     } else if (keys.ArrowDown.pressed) {
@@ -597,7 +597,7 @@ window.addEventListener('keydown', (event) => {
             break;
         case 'w':
             if (!playerCharacter.isJumping) {
-                playerCharacter.velocity.y = -5;
+                playerCharacter.velocity.y = -11;
                 playerCharacter.isJumping = true;
             }
             break;
@@ -620,7 +620,7 @@ window.addEventListener('keydown', (event) => {
             break;
         case 'ArrowUp':
             if (!enemyCharacter.isJumping) {
-                enemyCharacter.velocity.y = -5;
+                enemyCharacter.velocity.y = -11;
                 enemyCharacter.isJumping = true;
             }
             break;
