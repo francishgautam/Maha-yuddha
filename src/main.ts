@@ -3,8 +3,8 @@ import './style.css';
 const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-canvas.width = 1000;
-canvas.height = 460;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight-50;
 const gravity = 0.4;
 
 let playGame: boolean = true;
@@ -272,7 +272,7 @@ class Character extends CreateCharacter {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-        if (this.position.y + this.height >= canvas.height) {
+        if (this.position.y + this.height >= canvas.height ) {
             this.position.y = canvas.height - this.height;
             this.velocity.y = 0;
             this.isJumping = false;
@@ -285,308 +285,201 @@ class Character extends CreateCharacter {
     }
 }
 
-const background = new CreateCharacter(
-    {
-        x: -400,
-        y: -100
+const characterSprites: Record<string, Record<string, Sprite>> = {
+    Luffy: {
+        idle: { imageSrc: '/afro-luffy/idle.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/afro-luffy/running.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/afro-luffy/jumping.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/afro-luffy/heavyAttack.png', scale: 0.6, framesMax: 3, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/afro-luffy/lightAttack.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/afro-luffy/blocking.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false }
     },
-    '/pokhara.jpg',
-    1,
-    1,
-    { x: 0, y: 0 }
-);
-const fireLeft = new CreateCharacter(
-    {
-        x: -30,
-        y: 100
-    },
-    '/fire.png',
-    15,
-    6,
-    { x: 0, y: 0 }
-);
-const fireRight = new CreateCharacter(
-    {
-        x: 800,
-        y: 100
-    },
-    '/fire.png',
-    15,
-    6,
-    { x: 0, y: 0 }
-);
-
-const playerCharacter = new Character(
-    {
-        x: 200,
-        y: 700
-    },
-    {
-        x: 0,
-        y: 0
-    },
-    'gray',
-    {
-        idle: {
-            imageSrc: '/zoro/idle.png',
-            scale: 0.5,
-            framesMax: 3,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        run: {
-            imageSrc: '/zoro/running.png',
-            scale: 0.5,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        jump: {
-            imageSrc: '/zoro/jumping.png',
-            scale: 0.5,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        attackUpper: {
-            imageSrc: '/zoro/lightAttack.png',
-            scale: 0.5,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        attackLower: {
-            imageSrc: '/zoro/heavyAttack.png',
-            scale: 0.5,
-            framesMax: 4,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        block : {
-            imageSrc: '/zoro/blocking.png',
-            scale: 0.6,
-            framesMax: 2,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        }
+    Zoro: {
+        idle: { imageSrc: '/zoro/idle.png', scale: 0.5, framesMax: 3, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/zoro/running.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/zoro/jumping.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/zoro/lightAttack.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/zoro/heavyAttack.png', scale: 0.5, framesMax: 4, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/zoro/blocking.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false }
     }
-);
+};
 
-const enemyCharacter = new Character(
-    {
-        x: 700,
-        y: 700
-    },
-    {
-        x: 0,
-        y: 0
-    },
-    'purple',
-    {
-        idle: {
-            imageSrc: '/afro-luffy/idle.png',
-            scale: 0.6,
-            framesMax: 2,
-            correctCropParameters: { x: 0, y: 20 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        run: {
-            imageSrc: '/afro-luffy/running.png',
-            scale: 0.6,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        jump: {
-            imageSrc: '/afro-luffy/jumping.png',
-            scale: 0.6,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        attackUpper: {
-            imageSrc: '/afro-luffy/heavyAttack.png',
-            scale: 0.6,
-            framesMax: 3,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        attackLower: {
-            imageSrc: '/afro-luffy/lightAttack.png',
-            scale: 0.6,
-            framesMax: 1,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        },
-        block : {
-            imageSrc: '/afro-luffy/blocking.png',
-            scale: 0.6,
-            framesMax: 2,
-            correctCropParameters: { x: 0, y: 0 },
-            image: new Image(),
-            imageLoaded: false
-        }
+const backgroundSprites: Record<string, string> = {
+    Pokhara: '/pokhara.jpg',
+    Lumbini: '/lumbini.jpg',
+    Galli: '/galli.jpg',
+    Tilicho: '/tilicho.jpg'
+};
+
+let selectedPlayerCharacter: string = 'Luffy';
+let selectedEnemyCharacter: string = 'Luffy';
+let selectedBackground: string = 'Pokhara';
+
+document.querySelectorAll('.player-selection .character').forEach(character => {
+    character.addEventListener('click', function(this: HTMLElement) {
+        selectedPlayerCharacter = this.getAttribute('data-character') as string;
+        document.querySelector('.player-selection .selected')?.classList.remove('selected');
+        this.classList.add('selected');
+    });
+});
+
+document.querySelectorAll('.enemy-selection .character').forEach(character => {
+    character.addEventListener('click', function(this: HTMLElement) {
+        selectedEnemyCharacter = this.getAttribute('data-character') as string;
+        document.querySelector('.enemy-selection .selected')?.classList.remove('selected');
+        this.classList.add('selected');
+    });
+});
+
+document.querySelectorAll('.location-selection .background').forEach(background => {
+    background.addEventListener('click', function(this: HTMLElement) {
+        selectedBackground = this.getAttribute('data-background') as string;
+        document.querySelector('.location-selection .selected')?.classList.remove('selected');
+        this.classList.add('selected');
+    });
+});
+
+const startGameButton = document.querySelector('#startGameButton') as HTMLElement;
+startGameButton.addEventListener('click', () => {
+    const selectionContainer = document.getElementById('selection-container');
+    if (selectionContainer) {
+        selectionContainer.style.display = 'none';
     }
-);
+    const gameContainer = document.querySelector('.game-container') as HTMLElement;
+    if (gameContainer) {
+        gameContainer.style.display = 'block';
+    }
+    startGame();
+});
 
-function upperAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
-    return (
-        !enemyAttackRectangle.blocking &&
-        playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
-        playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
-        playerAttackRectangle.attackRange.position.y + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
-        playerAttackRectangle.attackRange.position.y <= enemyAttackRectangle.position.y + enemyAttackRectangle.height &&
-        playerAttackRectangle.isAttackingUpper
+let playerCharacter: Character;
+let enemyCharacter: Character;
+
+function startGame() {
+    const playerSprites = characterSprites[selectedPlayerCharacter];
+    const enemySprites = characterSprites[selectedEnemyCharacter];
+    const backgroundSprite = backgroundSprites[selectedBackground];
+
+    const background = new CreateCharacter(
+        { x: -170, y: 0 },
+        backgroundSprite,
+        1,
+        1,
+        { x: 0, y: 0 }
     );
-}
 
-function lowerAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
-    return (
-        !enemyAttackRectangle.blocking &&
-        playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
-        playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
-        playerAttackRectangle.attackRange.position.y + playerAttackRectangle.height - playerAttackRectangle.attackRange.height + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
-        playerAttackRectangle.attackRange.position.y + playerAttackRectangle.height - playerAttackRectangle.attackRange.height <= enemyAttackRectangle.position.y + enemyAttackRectangle.height &&
-        playerAttackRectangle.isAttackingLower
+    playerCharacter = new Character(
+        { x: 500, y: 0 },
+        { x: 0, y: 0 },
+        'gray',
+        playerSprites
     );
-}
 
-// Function to check health
-function declareWinner() {
-    let winner = document.querySelector('.declareWinner') as HTMLElement;
-    if (playerCharacter.health <= 0) {
-        winner.innerText = 'Enemy Wins! Click to restart game';
-        playGame = false;
-    } else if (enemyCharacter.health <= 0) {
-        winner.innerText = 'Player Wins! Click to restart game';
-        playGame = false;
-    }
-}
+    enemyCharacter = new Character(
+        { x: 920, y: 0 },
+        { x: 0, y: 0 },
+        'purple',
+        enemySprites
+    );
 
-// Function for boundary crossing 
-function checkCentralCrossing() {
-    if (playerCharacter.position.x < 40 || playerCharacter.position.x > 800 && playerCharacter.position.y) {
-        playerCharacter.health = 0;
-    } else if (enemyCharacter.position.x < 40 || enemyCharacter.position.x > 900) {
-        enemyCharacter.health = 0;
-    }
-}
+    function startAnimation() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        background.update();
+        playerCharacter.update();
+        enemyCharacter.update();
 
-// Start animation loop
-function startAnimation() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    background.update();
-    fireLeft.update();
-    fireRight.update();
-    playerCharacter.update();
-    enemyCharacter.update();
+        playerCharacter.facingRight = playerCharacter.position.x < enemyCharacter.position.x;
+        enemyCharacter.facingRight = enemyCharacter.position.x < playerCharacter.position.x;
 
-    playerCharacter.facingRight = playerCharacter.position.x < enemyCharacter.position.x;
-    enemyCharacter.facingRight = enemyCharacter.position.x < playerCharacter.position.x;
-
-    // Adding booleans for update of keys
-    if (keys.a.pressed && playerCharacter.blocking == false) {
-        playerCharacter.position.x += -5;
-        playerCharacter.setAction('run');
-    } else if (keys.d.pressed && playerCharacter.blocking == false) {
-        playerCharacter.position.x += 5;
-        playerCharacter.setAction('run');
-    } else if (keys.ArrowDown.pressed) {
-        playerCharacter.setAction('block');
-    } else if (keys.w.pressed && !playerCharacter.isJumping) {
-        playerCharacter.velocity.y = -10;
-        playerCharacter.isJumping = true;
-    } else if (keys.ArrowUp.pressed && !enemyCharacter.isJumping) {
-        enemyCharacter.velocity.y = -10;
-        enemyCharacter.isJumping = true;
-    } else if (keys.ArrowLeft.pressed && enemyCharacter.blocking == false) {
-        enemyCharacter.position.x += -5;
-        enemyCharacter.setAction('run');
-    } else if (keys.ArrowRight.pressed && enemyCharacter.blocking == false) {
-        enemyCharacter.position.x += 5;
-        enemyCharacter.setAction('run');
-    } else if (keys.ArrowDown.pressed) {
-        enemyCharacter.setAction('block');
-    } else {
-        if (!playerCharacter.isAttackingUpper && !playerCharacter.isAttackingLower && !playerCharacter.isJumping) {
-            playerCharacter.setAction('idle');
+        if (keys.a.pressed && playerCharacter.blocking == false) {
+            playerCharacter.position.x += -5;
+            playerCharacter.setAction('run');
+        } else if (keys.d.pressed && playerCharacter.blocking == false) {
+            playerCharacter.position.x += 5;
+            playerCharacter.setAction('run');
+        } else if (keys.ArrowDown.pressed) {
+            playerCharacter.setAction('block');
+        } else if (keys.w.pressed && !playerCharacter.isJumping) {
+            playerCharacter.velocity.y = -10;
+            playerCharacter.isJumping = true;
+        } else if (keys.ArrowUp.pressed && !enemyCharacter.isJumping) {
+            enemyCharacter.velocity.y = -10;
+            enemyCharacter.isJumping = true;
+        } else if (keys.ArrowLeft.pressed && enemyCharacter.blocking == false) {
+            enemyCharacter.position.x += -5;
+            enemyCharacter.setAction('run');
+        } else if (keys.ArrowRight.pressed && enemyCharacter.blocking == false) {
+            enemyCharacter.position.x += 5;
+            enemyCharacter.setAction('run');
+        } else if (keys.ArrowDown.pressed) {
+            enemyCharacter.setAction('block');
+        } else {
+            if (!playerCharacter.isAttackingUpper && !playerCharacter.isAttackingLower && !playerCharacter.isJumping) {
+                playerCharacter.setAction('idle');
+            }
+            if (!enemyCharacter.isAttackingUpper && !enemyCharacter.isAttackingLower && !enemyCharacter.isJumping) {
+                enemyCharacter.setAction('idle');
+            }
         }
-        if (!enemyCharacter.isAttackingUpper && !enemyCharacter.isAttackingLower && !enemyCharacter.isJumping) {
-            enemyCharacter.setAction('idle');
+
+        if (
+            upperAttackDetection({ playerAttackRectangle: playerCharacter, enemyAttackRectangle: enemyCharacter }) && playerCharacter.isAttackingUpper
+        ) {
+            playerCharacter.isAttackingUpper = false;
+            playerCharacter.applyUpperAttack(enemyCharacter);
+            let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
+            enemyHealthBar.style.width = enemyCharacter.health + '%';
+            console.log('Upper attack detected by player');
+        }
+
+        if (
+            upperAttackDetection({ playerAttackRectangle: enemyCharacter, enemyAttackRectangle: playerCharacter }) && enemyCharacter.isAttackingUpper
+        ) {
+            enemyCharacter.isAttackingUpper = false;
+            enemyCharacter.applyUpperAttack(playerCharacter);
+            let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
+            playerHealthBar.style.width = playerCharacter.health + '%';
+            console.log('Upper attack detected by enemy');
+        }
+
+        if (
+            lowerAttackDetection({ playerAttackRectangle: playerCharacter, enemyAttackRectangle: enemyCharacter }) && playerCharacter.isAttackingLower
+        ) {
+            playerCharacter.isAttackingLower = false;
+            playerCharacter.applyLowerAttack(enemyCharacter);
+            let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
+            enemyHealthBar.style.width = enemyCharacter.health + '%';
+            console.log('Lower attack detected by player');
+        }
+
+        if (
+            lowerAttackDetection({ playerAttackRectangle: enemyCharacter, enemyAttackRectangle: playerCharacter }) && enemyCharacter.isAttackingLower
+        ) {
+            enemyCharacter.isAttackingLower = false;
+            enemyCharacter.applyLowerAttack(playerCharacter);
+            let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
+            playerHealthBar.style.width = playerCharacter.health + '%';
+            console.log('Lower attack detected by enemy');
+        }
+
+        if (playerCharacter.blocking == true) {
+            playerCharacter.setAction('block');
+        }
+        if (enemyCharacter.blocking == true) {
+            enemyCharacter.setAction('block');
+        }
+
+        checkCentralCrossing();
+        declareWinner();
+
+        if (playGame) {
+            requestAnimationFrame(startAnimation);
         }
     }
 
-    // Collision detection for upper attack
-    if (
-        upperAttackDetection({ playerAttackRectangle: playerCharacter, enemyAttackRectangle: enemyCharacter }) && playerCharacter.isAttackingUpper
-    ) {
-        playerCharacter.isAttackingUpper = false;
-        playerCharacter.applyUpperAttack(enemyCharacter);
-        let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
-        enemyHealthBar.style.width = enemyCharacter.health + '%';
-        console.log('Upper attack detected by player');
-    }
-
-    if (
-        upperAttackDetection({ playerAttackRectangle: enemyCharacter, enemyAttackRectangle: playerCharacter }) && enemyCharacter.isAttackingUpper
-    ) {
-        enemyCharacter.isAttackingUpper = false;
-        enemyCharacter.applyUpperAttack(playerCharacter);
-        let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
-        playerHealthBar.style.width = playerCharacter.health + '%';
-        console.log('Upper attack detected by enemy');
-    }
-
-    // Collision detection for lower attack
-    if (
-        lowerAttackDetection({ playerAttackRectangle: playerCharacter, enemyAttackRectangle: enemyCharacter }) && playerCharacter.isAttackingLower
-    ) {
-        playerCharacter.isAttackingLower = false;
-        playerCharacter.applyLowerAttack(enemyCharacter);
-        let enemyHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLElement;
-        enemyHealthBar.style.width = enemyCharacter.health + '%';
-        console.log('Lower attack detected by player');
-    }
-
-    if (
-        lowerAttackDetection({ playerAttackRectangle: enemyCharacter, enemyAttackRectangle: playerCharacter }) && enemyCharacter.isAttackingLower
-    ) {
-        enemyCharacter.isAttackingLower = false;
-        enemyCharacter.applyLowerAttack(playerCharacter);
-        let playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLElement;
-        playerHealthBar.style.width = playerCharacter.health + '%';
-        console.log('Lower attack detected by enemy');
-    }
-
-    if(playerCharacter.blocking == true){
-        playerCharacter.setAction('block');
-    }
-    if(enemyCharacter.blocking == true){
-        enemyCharacter.setAction('block');
-    }
-
-    checkCentralCrossing();
-    declareWinner();
-
-    if (playGame) {
-        requestAnimationFrame(startAnimation);
-    }
+    startAnimation();
 }
 
-startAnimation();
-
-// Adding event listeners
 window.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'a':
@@ -611,7 +504,6 @@ window.addEventListener('keydown', (event) => {
             playerCharacter.blocking = true;
             break;
 
-        // Event listener for enemy player
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true;
             break;
@@ -664,3 +556,43 @@ window.addEventListener('keyup', (event) => {
             enemyCharacter.blocking = false;
     }
 });
+
+function upperAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
+    return (
+        !enemyAttackRectangle.blocking &&
+        playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
+        playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
+        playerAttackRectangle.attackRange.position.y + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
+        playerAttackRectangle.attackRange.position.y <= enemyAttackRectangle.position.y + enemyAttackRectangle.height &&
+        playerAttackRectangle.isAttackingUpper
+    );
+}
+
+function lowerAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: { playerAttackRectangle: Character, enemyAttackRectangle: Character }) {
+    return (
+        !enemyAttackRectangle.blocking &&
+        playerAttackRectangle.attackRange.position.x + playerAttackRectangle.attackRange.width >= enemyAttackRectangle.position.x &&
+        playerAttackRectangle.attackRange.position.x <= enemyAttackRectangle.position.x + enemyAttackRectangle.width &&
+        playerAttackRectangle.attackRange.position.y + playerCharacter.height - playerAttackRectangle.attackRange.height + playerAttackRectangle.attackRange.height >= enemyAttackRectangle.position.y &&
+        playerAttackRectangle.attackRange.position.y + playerCharacter.height - playerAttackRectangle.attackRange.height <= enemyAttackRectangle.position.y + enemyAttackRectangle.height &&
+        playerAttackRectangle.isAttackingLower
+    );
+}
+
+function checkCentralCrossing() {
+    if (playerCharacter.position.x < 155 || playerCharacter.position.x > canvas.width-250 && playerCharacter.position.y) {
+        playerCharacter.health = 0;
+    } else if (enemyCharacter.position.x < 140 || enemyCharacter.position.x > canvas.width-250) {
+        enemyCharacter.health = 0;
+    }
+}
+function declareWinner() {
+    let winner = document.querySelector('.declareWinner') as HTMLElement;
+    if (playerCharacter.health <= 0) {
+        winner.innerText = 'Enemy Wins! Click to restart game';
+        playGame = false;
+    } else if (enemyCharacter.health <= 0) {
+        winner.innerText = 'Player Wins! Click to restart game';
+        playGame = false;
+    }
+}

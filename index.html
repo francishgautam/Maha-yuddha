@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-    <title>Maha yuddha</title>
-  </head>
-  <body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <title>Maha yuddha</title>
+</head>
+<body>
+  <div id="selection-container">
     <div class="character-selection">
       <h2>Select Player Character</h2>
       <div class="character-options player-selection">
@@ -26,36 +27,29 @@
     <div class="background-selection">
       <h2>Select background for yuddha</h2>
       <div class="background-options location-selection">
-        <div class="background" data-character="Pokhara">Pokhara</div>
-        <div class="background" data-character="Lumbini">Lumbini</div>
-        <div class="background" data-character="Galli">Galli</div>
-        <div class="background" data-character="Tilicho">Tilicho</div>
+        <div class="background" data-background="Pokhara">Pokhara</div>
+        <div class="background" data-background="Lumbini">Lumbini</div>
+        <div class="background" data-background="Galli">Galli</div>
+        <div class="background" data-background="Tilicho">Tilicho</div>
       </div>
     </div>
-    <div class="difficuilty-selection">
-      <h2>Select your difficuilty</h2>
-      <button>Prince</button>
-      <button>King</button>
-      <button>Emperor</button>
-    </div>
-    <div class="game-container">
-      <div class="declareWinner"></div>
-      <div class="stats-block">
-        <!-- //Health and power up bar for player -->
-        <div class="stats">
-          <div class="stats__health-bar--player">Player health bar</div>
-          <div class="stats__power-bar--player">Player power up bar</div>
-        </div>
-  
-        <!-- //Health and power up for enemy -->
-        <div class="stats">
-          <div class="stats__health-bar--enemy">Enemy health bar</div>
-          <div class="stats__power-bar--enemy">Enemy power up bar</div>
-        </div>
+    <button id="startGameButton">Start Game</button>
+  </div>
+  <div class="game-container" style="display: none;">
+    <div class="declareWinner"></div>
+    <div class="stats-block">
+      <div class="stats">
+        <div class="stats__health-bar--player">Player health bar</div>
+        <div class="stats__power-bar--player">Player power up bar</div>
       </div>
-      <canvas id="canvas"></canvas>
+      <div class="stats">
+        <div class="stats__health-bar--enemy">Enemy health bar</div>
+        <div class="stats__power-bar--enemy">Enemy power up bar</div>
+      </div>
     </div>
-    <script src="/src/classes.ts"></script>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+    <canvas id="canvas"></canvas>
+  </div>
+  <script src="/src/classes.ts"></script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
 </html>
