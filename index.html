@@ -9,31 +9,34 @@
 <body>
   <div id="selection-container">
     <div class="character-selection">
-      <h2>Select Player Character</h2>
+      <h2>आफ्नो योद्धा रोज्नुहोस् खेलाडी एक</h2>
       <div class="character-options player-selection">
-        <div class="character" data-character="Luffy"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Zoro"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Sanji"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Brook"><img src="./public/afro-luffy/jumping.png"></div>
+        <div class="character" data-character="Luffy"><img src="./afro-luffy/jumping.png"></div>
+        <div class="character" data-character="Zoro"><img src="./zoro/jumping.png"></div>
+        <div class="character" data-character="Smoker"><img src="./smoker/jumping.png"></div>
+        <div class="character" data-character="Hancock"><img src="./hancock/jumping.png"></div>
       </div>
-      <h2>Select Enemy Character</h2>
+      <h2>आफ्नो योद्धा रोज्नुहोस् खेलाडी दुई</h2>
       <div class="character-options enemy-selection">
-        <div class="character" data-character="Luffy"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Zoro"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Sanji"><img src="./public/afro-luffy/jumping.png"></div>
-        <div class="character" data-character="Brook"><img src="./public/afro-luffy/jumping.png"></div>
+        <div class="character" data-character="Luffy"><img src="./afro-luffy/jumping.png" alt="Afro Luffy"></div>
+        <div class="character" data-character="Zoro"><img src="./zoro/jumping.png" alt="Zoro"></div>
+        <div class="character" data-character="Smoker"><img src="./smoker/jumping.png" alt="Smoker"></div>
+        <div class="character" data-character="Hancock"><img src="./hancock/jumping.png" alt="Hancock"></div>
       </div>
     </div>
+    <button id="characterConfirmationButton">Confirm selection</button>
+  </div>
+  <div id="background-selection-container">
     <div class="background-selection">
       <h2>Select background for yuddha</h2>
       <div class="background-options location-selection">
-        <div class="background" data-background="Pokhara">Pokhara</div>
-        <div class="background" data-background="Lumbini">Lumbini</div>
-        <div class="background" data-background="Galli">Galli</div>
-        <div class="background" data-background="Tilicho">Tilicho</div>
+        <div class="background" data-background="Pokhara"><img src="./pokhara.webp" alt="Pokhara" class="background-image"></div>
+        <div class="background" data-background="Lumbini"><img src="./lumbini.webp" alt="lumbini" class="background-image"></div>
+        <div class="background" data-background="MountEverest"><img src="./mount-everest.webp" alt="mount-everest" class="background-image"></div>
+        <div class="background" data-background="Tilicho"><img src="./tilicho.webp" alt="tilicho" class="background-image"></div>
       </div>
     </div>
-    <button id="startGameButton">Start Game</button>
+    <button id="startGameButton">युद्ध सुरु!</button>
   </div>
   <div class="game-container" style="display: none;">
     <div class="declareWinner"></div>

@@ -4,10 +4,12 @@ const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight-50;
-const gravity = 0.4;
+canvas.height = window.innerHeight;
+let gravity = 0.4;
 
 let playGame: boolean = true;
+let paused: boolean = false;  // Pause flag
+let gameSpeed : number;
 
 interface Position {
     x: number;
@@ -150,16 +152,16 @@ class Character extends CreateCharacter {
     ) {
         super(position, sprites.idle.imageSrc, sprites.idle.scale, sprites.idle.framesMax, sprites.idle.correctCropParameters);
         this.velocity = velocity;
-        this.height = 100;
-        this.width = 50;
+        this.height = 200;
+        this.width = 150;
         this.sprite = sprite;
         this.attackRange = {
             position: {
                 x: this.position.x,
                 y: this.position.y
             },
-            width: 100,
-            height: 10,
+            width: 200,
+            height: 30,
             correctCropParameters: {
                 x: 0,
                 y: 0
@@ -203,31 +205,39 @@ class Character extends CreateCharacter {
     }
 
     attackingUpper() {
-        if (!this.canAttackUpper) return;  // Prevent attacking if in cooldown
-        this.canAttackUpper = false;  // Start cooldown
-        this.setAction('attackUpper');
-        this.isAttackingUpper = true;
-        setTimeout(() => {
-            this.isAttackingUpper = false;
-            if (this.currentAction === 'attackUpper') this.setAction('idle');
-        }, 800); // Increased duration for attack animation
-        setTimeout(() => {
-            this.canAttackUpper = true;  // Reset cooldown after 5 seconds
-        }, 5000);
+            if( !enemyCharacter.isJumping == false || !playerCharacter.isJumping == false){  //So that characters cannot upper attack in air
+                return
+            }
+
+            if (!this.canAttackUpper) return;  // Prevent attacking if in cooldown
+            this.canAttackUpper = false;  // Start cooldown
+            this.setAction('attackUpper');
+            this.isAttackingUpper = true;
+            setTimeout(() => {
+                this.isAttackingUpper = false;
+                if (this.currentAction === 'attackUpper') this.setAction('idle');
+            }, 800); // Increased duration for attack animation
+            setTimeout(() => {
+                this.canAttackUpper = true;  // Reset cooldown after 5 seconds
+            }, 5000);
+            
     }
 
     attackingLower() {
-        if (!this.canAttackLower) return;  // Prevent attacking if in cooldown
-        this.canAttackLower = false;  // Start cooldown
-        this.setAction('attackLower');
-        this.isAttackingLower = true;
-        setTimeout(() => {
-            this.isAttackingLower = false;
-            if (this.currentAction === 'attackLower') this.setAction('idle');
-        }, 800); // Increased duration for attack animation
-        setTimeout(() => {
-            this.canAttackLower = true;  // Reset cooldown after 3 seconds
-        }, 3000);
+        if( !enemyCharacter.isJumping == false || !playerCharacter.isJumping == false){     //So that characters cannot lower attack in air
+            return
+        }
+            if (!this.canAttackLower) return;  // Prevent attacking if in cooldown
+            this.canAttackLower = false;  // Start cooldown
+            this.setAction('attackLower');
+            this.isAttackingLower = true;
+            setTimeout(() => {
+                this.isAttackingLower = false;
+                if (this.currentAction === 'attackLower') this.setAction('idle');
+            }, 800); // Increased duration for attack animation
+            setTimeout(() => {
+                this.canAttackLower = true;  // Reset cooldown after 3 seconds
+            }, 3000);
     }
 
     applyUpperAttack(enemy: Character) {
@@ -253,6 +263,152 @@ class Character extends CreateCharacter {
         const powerBar = document.querySelector(`.stats__power-bar--${this.sprite === 'gray' ? 'player' : 'enemy'}`) as HTMLElement;
         powerBar.style.width = this.power + '%';
     }
+
+    //Power up code
+    zoroPowerUpPlayer(){
+        if(this.power >= 100 && (selectedPlayerCharacter == 'Zoro')){
+            this.attackLowerDamage *= 5;
+            this.attackUpperDamage *= 5;
+            alert('Zoro power up added');
+        }
+        else{
+            return;
+        }
+
+        //Reset power bar
+        this.power = 0;
+        this.updatePowerBar();
+
+        setTimeout(()=>{
+            this.attackLowerDamage /= 2;
+            this.attackUpperDamage /= 2;
+        }, 7000)
+    }
+
+    zoroPowerUpEnemy(){
+        if(this.power >= 100 && (selectedEnemyCharacter == 'Zoro')){
+            this.attackLowerDamage *= 5;
+            this.attackUpperDamage *= 5;
+            alert('Zoro power up added');
+        }
+        else{
+            return;
+        }
+
+        //Reset power bar
+        this.power = 0;
+        this.updatePowerBar();
+
+        setTimeout(()=>{
+            this.attackLowerDamage /= 2;
+            this.attackUpperDamage /= 2;
+        }, 7000)
+    }
+
+    luffyPowerUpPlayer() {
+        if (this.power >= 100 && (selectedPlayerCharacter == 'Luffy' || selectedEnemyCharacter == 'Luffy')) {
+            alert('Luffy Power Up added');
+
+            //Power up for luffy
+            const powerUpBar = document.querySelector('.stats__power-bar--enemy') as HTMLElement;
+            enemyCharacter.power = 0;
+            powerUpBar.style.width = enemyCharacter.power + '%';
+            playerCharacter.position.x = enemyCharacter.position.x-100;
+
+            // Reset the power bar
+            this.power = 0;
+            this.updatePowerBar();
+            
+            //Reset other parameters
+            setTimeout(() => {
+        
+            },7000);
+        } else {
+            return;
+        }
+    }
+    luffyPowerUpEnemy() {
+        if (this.power >= 100 && (selectedEnemyCharacter == 'Luffy')) {
+            alert('Luffy Power Up added');
+
+            //Power up for luffy
+            const powerUpBar = document.querySelector('.stats__power-bar--player') as HTMLElement;
+            playerCharacter.power = 0;
+            powerUpBar.style.width = playerCharacter.power + '%';
+
+            // Reset the power bar
+            this.power = 0;
+            this.updatePowerBar();
+
+            //Reset other parameters
+            setTimeout(()=>{
+            }, 7000)
+        } else {
+            return;
+        }
+    }
+
+    smokerPowerUpPlayer(){
+        if (this.power >= 100 && (selectedPlayerCharacter == 'Smoker')) {
+            alert('Smoker Power Up added');
+
+            this.pushEffect += 200;
+            // Reset the power bar
+            this.power = 0;
+            this.updatePowerBar();
+
+            //Reset other parameters
+            setTimeout(()=>{
+                this.pushEffect = 200;
+            }, 10000)
+        } else {
+            return;
+        }
+    }
+    smokerPowerUpEnemy(){
+        if (this.power >= 100 && (selectedEnemyCharacter == 'Smoker')) {
+            alert('Smoker Power Up added');
+
+            this.pushEffect += 200;
+            // Reset the power bar
+            this.power = 0;
+            this.updatePowerBar();
+
+            //Reset other parameters
+            setTimeout(()=>{
+                this.pushEffect = 200;
+            }, 10000)
+        } else {
+            return;
+        }
+    }
+    hancockPowerUpPlayer(){
+        if (this.power >= 100 && (selectedPlayerCharacter == 'Hancock')) {
+            alert('Hancock Power Up added');
+
+            //Power up for Hancock
+            const playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLAreaElement;
+            this.health = 100;
+            playerHealthBar.style.width = this.health + '%';
+
+        } else {
+            return;
+        }
+    }
+    hancockPowerUpEnemy(){
+        if (this.power >= 100 && (selectedEnemyCharacter == 'Hancock')) {
+            alert('Hancock Power Up added');
+
+            //Power up for Hancock
+            const playerHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLAreaElement;
+            this.health = 100;
+            playerHealthBar.style.width = this.health + '%';
+    
+        } else {
+            return;
+        }
+    }
+
 
     update() {
         this.facingRight = this.position.x < (this === playerCharacter ? enemyCharacter.position.x : playerCharacter.position.x);
@@ -287,32 +443,57 @@ class Character extends CreateCharacter {
 
 const characterSprites: Record<string, Record<string, Sprite>> = {
     Luffy: {
-        idle: { imageSrc: '/afro-luffy/idle.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
-        run: { imageSrc: '/afro-luffy/running.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
-        jump: { imageSrc: '/afro-luffy/jumping.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
-        attackUpper: { imageSrc: '/afro-luffy/heavyAttack.png', scale: 0.6, framesMax: 3, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
-        attackLower: { imageSrc: '/afro-luffy/lightAttack.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false },
-        block: { imageSrc: '/afro-luffy/blocking.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 50 }, image: new Image(), imageLoaded: false }
+        idle: { imageSrc: '/afro-luffy/idle.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/afro-luffy/running.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/afro-luffy/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/afro-luffy/heavyAttack.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/afro-luffy/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/afro-luffy/blocking.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        
     },
     Zoro: {
-        idle: { imageSrc: '/zoro/idle.png', scale: 0.5, framesMax: 3, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
-        run: { imageSrc: '/zoro/running.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
-        jump: { imageSrc: '/zoro/jumping.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
-        attackUpper: { imageSrc: '/zoro/lightAttack.png', scale: 0.5, framesMax: 1, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
-        attackLower: { imageSrc: '/zoro/heavyAttack.png', scale: 0.5, framesMax: 4, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false },
-        block: { imageSrc: '/zoro/blocking.png', scale: 0.6, framesMax: 2, correctCropParameters: { x: 0, y: 0 }, image: new Image(), imageLoaded: false }
+        idle: { imageSrc: '/zoro/idle.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/zoro/running.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/zoro/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/zoro/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/zoro/heavyAttack.png', scale: 1, framesMax: 4, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/zoro/blocking.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
+    },
+    Smoker: {
+        idle: { imageSrc: '/smoker/idle.png', scale: 1, framesMax: 4, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/smoker/running.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/smoker/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/smoker/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/smoker/heavyAttack.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/smoker/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
+    },
+    Hancock: {
+        idle: { imageSrc: '/hancock/idle.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/hancock/running.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/hancock/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/hancock/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/hancock/heavyAttack.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/hancock/blocking.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+    },
+    LuffyPowerUp : {
+        idle: { imageSrc: '/luffy-power-up/idle.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        run: { imageSrc: '/luffy-power-up/running.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        jump: { imageSrc: '/luffy-power-up/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackUpper: { imageSrc: '/luffy-power-up/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        attackLower: { imageSrc: '/luffy-power-up/heavyAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        block: { imageSrc: '/luffy-power-up/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
     }
 };
 
 const backgroundSprites: Record<string, string> = {
-    Pokhara: '/pokhara.jpg',
-    Lumbini: '/lumbini.jpg',
-    Galli: '/galli.jpg',
-    Tilicho: '/tilicho.jpg'
+    Pokhara: '/pokhara.webp',
+    Lumbini: '/lumbini.webp',
+    MountEverest: '/mount-everest.webp',
+    Tilicho: '/tilicho.webp'
 };
 
 let selectedPlayerCharacter: string = 'Luffy';
-let selectedEnemyCharacter: string = 'Luffy';
+let selectedEnemyCharacter: string = 'LuffyPowerUp';
 let selectedBackground: string = 'Pokhara';
 
 document.querySelectorAll('.player-selection .character').forEach(character => {
@@ -339,18 +520,28 @@ document.querySelectorAll('.location-selection .background').forEach(background 
     });
 });
 
-const startGameButton = document.querySelector('#startGameButton') as HTMLElement;
-startGameButton.addEventListener('click', () => {
+const characterConfirmationButton = document.querySelector('#characterConfirmationButton') as HTMLElement;
+characterConfirmationButton.addEventListener('click', () => {
     const selectionContainer = document.getElementById('selection-container');
+    const backgroundSelectionContainer = document.getElementById('background-selection-container') as HTMLElement;
     if (selectionContainer) {
         selectionContainer.style.display = 'none';
+        backgroundSelectionContainer.style.display = 'block';
+    }
+});
+
+const startGameButton = document.querySelector('#startGameButton') as HTMLElement;
+startGameButton.addEventListener('click',()=>{
+    const backgroundSelectionContainer = document.getElementById('background-selection-container');
+    if(backgroundSelectionContainer){
+        backgroundSelectionContainer.style.display = 'none';
     }
     const gameContainer = document.querySelector('.game-container') as HTMLElement;
     if (gameContainer) {
         gameContainer.style.display = 'block';
     }
     startGame();
-});
+})
 
 let playerCharacter: Character;
 let enemyCharacter: Character;
@@ -361,22 +552,38 @@ function startGame() {
     const backgroundSprite = backgroundSprites[selectedBackground];
 
     const background = new CreateCharacter(
-        { x: -170, y: 0 },
+        { x: 0, y: 0 },
         backgroundSprite,
         1,
         1,
         { x: 0, y: 0 }
     );
 
+    const fireLeft = new CreateCharacter(
+        {x:75,y:350},
+        '/fire.png',
+        15,
+        6,
+        {x:0,y:0}
+    )
+
+    const fireRight = new CreateCharacter(
+        {x:1200,y:350},
+        '/fire.png',
+        15,
+        6,
+        {x:0,y:0}
+    )
+
     playerCharacter = new Character(
-        { x: 500, y: 0 },
-        { x: 0, y: 0 },
+        { x: 500, y: 700 },
+        { x: 0, y: 100 },
         'gray',
         playerSprites
     );
 
     enemyCharacter = new Character(
-        { x: 920, y: 0 },
+        { x: 920, y: 700 },
         { x: 0, y: 0 },
         'purple',
         enemySprites
@@ -387,6 +594,12 @@ function startGame() {
         background.update();
         playerCharacter.update();
         enemyCharacter.update();
+        fireLeft.update();
+        fireRight.update();
+
+        if (paused) {
+            return;  // Stop the animation loop if paused
+        }
 
         playerCharacter.facingRight = playerCharacter.position.x < enemyCharacter.position.x;
         enemyCharacter.facingRight = enemyCharacter.position.x < playerCharacter.position.x;
@@ -475,6 +688,8 @@ function startGame() {
         if (playGame) {
             requestAnimationFrame(startAnimation);
         }
+        bot();
+        console.log(canvas.height,canvas.width)
     }
 
     startAnimation();
@@ -503,7 +718,12 @@ window.addEventListener('keydown', (event) => {
         case 's':
             playerCharacter.blocking = true;
             break;
-
+        case 'f':
+            playerCharacter.zoroPowerUpPlayer();
+            playerCharacter.luffyPowerUpPlayer();
+            playerCharacter.smokerPowerUpPlayer();
+            playerCharacter.hancockPowerUpPlayer();
+            break;
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true;
             break;
@@ -525,8 +745,16 @@ window.addEventListener('keydown', (event) => {
         case 'ArrowDown':
             enemyCharacter.blocking = true;
             break;
+        case 'p':
+            enemyCharacter.luffyPowerUpEnemy();
+            enemyCharacter.zoroPowerUpEnemy();
+            enemyCharacter.smokerPowerUpEnemy();
+            enemyCharacter.hancockPowerUpEnemy();
+            break;
+        case ' ':
+            togglePause();  // Toggle pause on spacebar press
+            break;
     }
-    console.log(event.key);
 });
 
 window.addEventListener('keyup', (event) => {
@@ -580,12 +808,14 @@ function lowerAttackDetection({ playerAttackRectangle, enemyAttackRectangle }: {
 }
 
 function checkCentralCrossing() {
-    if (playerCharacter.position.x < 155 || playerCharacter.position.x > canvas.width-250 && playerCharacter.position.y) {
+    if (playerCharacter.position.x < 155|| playerCharacter.position.x > canvas.width-250 ) {
         playerCharacter.health = 0;
+        console.log(playerCharacter.position.y)
     } else if (enemyCharacter.position.x < 140 || enemyCharacter.position.x > canvas.width-250) {
         enemyCharacter.health = 0;
     }
 }
+
 function declareWinner() {
     let winner = document.querySelector('.declareWinner') as HTMLElement;
     if (playerCharacter.health <= 0) {
@@ -594,5 +824,44 @@ function declareWinner() {
     } else if (enemyCharacter.health <= 0) {
         winner.innerText = 'Player Wins! Click to restart game';
         playGame = false;
+    }
+}
+
+function bot(){
+    if (selectedEnemyCharacter === 'LuffyPowerUp') {
+
+        const moveDirection = Math.random();
+        if (moveDirection < 0.33) {
+            keys.ArrowLeft.pressed = true;
+            keys.ArrowRight.pressed = false;
+        } else if (moveDirection < 0.66) {
+            keys.ArrowLeft.pressed = false;
+            keys.ArrowRight.pressed = true;
+        } else {
+            keys.ArrowLeft.pressed = false;
+            keys.ArrowRight.pressed = false;
+        }
+
+        // Randomly decide to jump
+        if (Math.random() < 0.1 && !enemyCharacter.isJumping) {
+            enemyCharacter.velocity.y = -11;
+            enemyCharacter.isJumping = true;
+        }
+
+        // Randomly decide to attack upper or lower
+        const attack = Math.random();
+        if (attack < 0.1) {
+            enemyCharacter.attackingUpper();
+        } else if (attack < 0.2) {
+            enemyCharacter.attackingLower();
+        }
+    }
+}
+
+// Function to toggle the pause state
+function togglePause() {
+    paused = !paused;
+    if (!paused) {
+        startGame();
     }
 }

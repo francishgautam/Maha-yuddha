@@ -52,19 +52,30 @@
     left: 600px;
 }
 
-
 /* Start game screen  styling*/
 
 .character-selection {
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    background-image: url('/character-selection.webp');
+    position: relative;
+    background-size: cover;
+    height: 100vh;
+    color: black;
+    font-weight: 900;
   }
   .character-options {
     display: flex;
     justify-content: space-around;
     width: 80%;
-    margin: 20px 0;
+    margin-left: 100px;
+    margin-top: 100px;
+  }
+  h2{
+    background-color: yellow;
+    width: 370px;
+    margin-left: 10%;
+    border-radius: 20px;
+    padding-left: 30px;
   }
   .character {
     cursor: pointer;
@@ -99,21 +110,60 @@
     border-color: #000;
   }
 
-  /* Screen layer */
-
-  /* .character-selection{
-    display: none;
-  } */
-
 img{
-    height: 100px;
+    background-color: white;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
 }
 
-  /* .background-selection{
-    display: none;
-  }
+#background-selection-container{
+  display: none;
+}
 
-  .difficuilty-selection{
-    display: none;
-  } */
+#characterConfirmationButton{
+  position: absolute;
+  top: 400px;
+  left: 700px;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #ff5a5f; /* Primary button color */
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+#characterConfirmationButton:hover {
+  background-color: #ff4a4f; /* Darker shade of the primary color */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.background-image{
+  width: 200px;
+  height: 200px;
+}
+
+#startGameButton{
+  background-color: green; 
+  border: none;
+  color: white; 
+  padding: 15px 30px; 
+  text-align: center; 
+  text-decoration: none; 
+  display: inline-block; 
+  font-size: 20px; 
+  margin: 10px 2px;
+  cursor: pointer; 
+  border-radius: 12px;
+  transition: background-color 0.3s, transform 0.3s;
+  margin-left: 47%;
+}
 
