@@ -361,7 +361,7 @@ class Character extends CreateCharacter {
             //Reset other parameters
             setTimeout(()=>{
                 this.pushEffect = 200;
-            }, 10000)
+            }, 7000)
         } else {
             return;
         }
@@ -387,7 +387,7 @@ class Character extends CreateCharacter {
         if (this.power >= 100 && (selectedPlayerCharacter == 'Hancock')) {
             alert('Hancock Power Up added');
 
-            //Power up for Hancock
+            //Power up
             const playerHealthBar = document.querySelector('.stats__health-bar--player') as HTMLAreaElement;
             this.health = 100;
             playerHealthBar.style.width = this.health + '%';
@@ -400,7 +400,7 @@ class Character extends CreateCharacter {
         if (this.power >= 100 && (selectedEnemyCharacter == 'Hancock')) {
             alert('Hancock Power Up added');
 
-            //Power up for Hancock
+            //Power up
             const playerHealthBar = document.querySelector('.stats__health-bar--enemy') as HTMLAreaElement;
             this.health = 100;
             playerHealthBar.style.width = this.health + '%';
@@ -702,6 +702,7 @@ function startGame() {
             requestAnimationFrame(startAnimation);
         }
         bot();
+        restartGame();
     }
 
     backgroundMusic.play();
@@ -830,21 +831,31 @@ function checkCentralCrossing() {
 }
 
 function declareWinner() {
-    let winner = document.querySelector('.declareWinner') as HTMLElement;
+    const winner = document.querySelector('.declareWinner') as HTMLElement | null;
+    if (!winner) {
+        console.error('Winner element not found');
+        return;
+    }
+
     if (playerCharacter.health <= 0) {
         winner.innerText = 'Enemy Wins! Click to restart game';
         playerCharacter.setAction('death');
-        setTimeout(()=>{
-        playGame = false;
-        },500);
+        setTimeout(() => {
+            playGame = false;
+        }, 500);
     } else if (enemyCharacter.health <= 0) {
         winner.innerText = 'Player Wins! Click to restart game';
         enemyCharacter.setAction('death');
-        setTimeout(()=>{
-        playGame = false;
-        },500);
+        setTimeout(() => {
+            playGame = false;
+        }, 500);
     }
+
+    winner.onclick = () => {
+        location.reload();
+    };
 }
+
 
 let botActionCooldown = false;
 
@@ -899,3 +910,4 @@ function togglePause() {
         startGame();
     }
 }
+
