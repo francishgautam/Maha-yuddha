@@ -31,9 +31,43 @@ The project aims to develop a simple 2D fighting game using HTML canvas, CSS for
 
 Enjoy playing Maha Yuddha!
 
-//Bugs 
+How to play?
 
-find and change sprites
-audio 
-character selection 
-attack animation while jumping --> disable
+The goal is to send the other player out of the boundary or reduce their health to zero.
+
+Keys:-
+
+For player one:-
+a and d  for movement for player one
+w for jump
+s for block
+t for heavy attack
+y for light attack 
+f for special move
+
+
+left right for movement for player two
+left and right for movement
+up for jump
+down for block
+k for heavy attack
+l for light attack 
+f for special move
+
+
+
+
+Features:- 
+you cannot attack while jumping or crouching
+heavy attack pushes the enemy away but does less damage than light attack
+power up bar can only be used when it is full
+
+
+Power up:-
+Luffy - Reduce the enemy power bar by zero , quickly teleports to the enemy position\
+Zoro - attack damage increase
+Smoker - Push effect increase for heavy attack
+Hancock - Self healing, increase to full health
+
+Press space to pause the game
+If you want to play with bot, leave the second player selection 
