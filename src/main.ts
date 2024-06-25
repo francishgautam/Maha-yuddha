@@ -702,7 +702,6 @@ function startGame() {
             requestAnimationFrame(startAnimation);
         }
         bot();
-        restartGame();
     }
 
     backgroundMusic.play();
