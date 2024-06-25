@@ -8,8 +8,9 @@ canvas.height = window.innerHeight;
 let gravity = 0.4;
 
 let playGame: boolean = true;
-let paused: boolean = false;  // Pause flag
-let gameSpeed : number;
+let paused: boolean = false; 
+const backgroundMusic = document.getElementById('backgroundMusic') as HTMLAudioElement;
+backgroundMusic.volume = 1;
 
 interface Position {
     x: number;
@@ -449,6 +450,7 @@ const characterSprites: Record<string, Record<string, Sprite>> = {
         attackUpper: { imageSrc: '/afro-luffy/heavyAttack.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackLower: { imageSrc: '/afro-luffy/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         block: { imageSrc: '/afro-luffy/blocking.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        death: { imageSrc: '/afro-luffy/death.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         
     },
     Zoro: {
@@ -457,7 +459,9 @@ const characterSprites: Record<string, Record<string, Sprite>> = {
         jump: { imageSrc: '/zoro/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackUpper: { imageSrc: '/zoro/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackLower: { imageSrc: '/zoro/heavyAttack.png', scale: 1, framesMax: 4, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
-        block: { imageSrc: '/zoro/blocking.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
+        block: { imageSrc: '/zoro/blocking.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        death: { imageSrc: '/zoro/death.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+
     },
     Smoker: {
         idle: { imageSrc: '/smoker/idle.png', scale: 1, framesMax: 4, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
@@ -465,7 +469,9 @@ const characterSprites: Record<string, Record<string, Sprite>> = {
         jump: { imageSrc: '/smoker/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackUpper: { imageSrc: '/smoker/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackLower: { imageSrc: '/smoker/heavyAttack.png', scale: 1, framesMax: 2, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
-        block: { imageSrc: '/smoker/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
+        block: { imageSrc: '/smoker/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        death: { imageSrc: '/smoker/death.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+
     },
     Hancock: {
         idle: { imageSrc: '/hancock/idle.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
@@ -474,6 +480,8 @@ const characterSprites: Record<string, Record<string, Sprite>> = {
         attackUpper: { imageSrc: '/hancock/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackLower: { imageSrc: '/hancock/heavyAttack.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         block: { imageSrc: '/hancock/blocking.png', scale: 0.6, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        death: { imageSrc: '/hancock/death.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+
     },
     LuffyPowerUp : {
         idle: { imageSrc: '/luffy-power-up/idle.png', scale: 1, framesMax: 3, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
@@ -481,7 +489,9 @@ const characterSprites: Record<string, Record<string, Sprite>> = {
         jump: { imageSrc: '/luffy-power-up/jumping.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackUpper: { imageSrc: '/luffy-power-up/lightAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
         attackLower: { imageSrc: '/luffy-power-up/heavyAttack.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
-        block: { imageSrc: '/luffy-power-up/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false }
+        block: { imageSrc: '/luffy-power-up/blocking.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+        death: { imageSrc: '/luffy-power-up/death.png', scale: 1, framesMax: 1, correctCropParameters: { x: 0, y: 100 }, image: new Image(), imageLoaded: false },
+
     }
 };
 
@@ -519,6 +529,9 @@ document.querySelectorAll('.location-selection .background').forEach(background 
         this.classList.add('selected');
     });
 });
+
+    backgroundMusic.src = `/audio/${selectedBackground}.mp3`;
+
 
 const characterConfirmationButton = document.querySelector('#characterConfirmationButton') as HTMLElement;
 characterConfirmationButton.addEventListener('click', () => {
@@ -598,7 +611,7 @@ function startGame() {
         fireRight.update();
 
         if (paused) {
-            return;  // Stop the animation loop if paused
+            return;
         }
 
         playerCharacter.facingRight = playerCharacter.position.x < enemyCharacter.position.x;
@@ -689,9 +702,9 @@ function startGame() {
             requestAnimationFrame(startAnimation);
         }
         bot();
-        console.log(canvas.height,canvas.width)
     }
 
+    backgroundMusic.play();
     startAnimation();
 }
 
@@ -820,18 +833,36 @@ function declareWinner() {
     let winner = document.querySelector('.declareWinner') as HTMLElement;
     if (playerCharacter.health <= 0) {
         winner.innerText = 'Enemy Wins! Click to restart game';
+        playerCharacter.setAction('death');
+        setTimeout(()=>{
         playGame = false;
+        },500);
     } else if (enemyCharacter.health <= 0) {
         winner.innerText = 'Player Wins! Click to restart game';
+        enemyCharacter.setAction('death');
+        setTimeout(()=>{
         playGame = false;
+        },500);
     }
 }
 
-function bot(){
-    if (selectedEnemyCharacter === 'LuffyPowerUp') {
+let botActionCooldown = false;
+
+function bot() {
+    if (selectedEnemyCharacter === 'LuffyPowerUp' && !botActionCooldown) {
+        botActionCooldown = true; 
 
         const moveDirection = Math.random();
-        if (moveDirection < 0.33) {
+
+        if(enemyCharacter.position.x>canvas.width-350){
+            keys.ArrowLeft.pressed = true;
+            keys.ArrowRight.pressed = false;
+        }
+        else if (enemyCharacter.position.x < 250) {
+            keys.ArrowLeft.pressed = false;
+            keys.ArrowRight.pressed = true;
+        }
+        else if (moveDirection < 0.33) {
             keys.ArrowLeft.pressed = true;
             keys.ArrowRight.pressed = false;
         } else if (moveDirection < 0.66) {
@@ -848,13 +879,16 @@ function bot(){
             enemyCharacter.isJumping = true;
         }
 
-        // Randomly decide to attack upper or lower
-        const attack = Math.random();
-        if (attack < 0.1) {
+        // Attack when player is closer
+        if (playerCharacter.position.x - enemyCharacter.position.x < 100) {
             enemyCharacter.attackingUpper();
-        } else if (attack < 0.2) {
+        } else if (playerCharacter.position.x - enemyCharacter.position.x < 100) {
             enemyCharacter.attackingLower();
         }
+
+        setTimeout(() => {
+            botActionCooldown = false;
+        }, 300); 
     }
 }
 

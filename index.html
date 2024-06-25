@@ -42,17 +42,23 @@
     <div class="declareWinner"></div>
     <div class="stats-block">
       <div class="stats">
-        <div class="stats__health-bar--player">Player health bar</div>
-        <div class="stats__power-bar--player">Player power up bar</div>
+        <div class="stats__health-bar--player"></div>
+        <div class="stats__power-bar--player"></div>
       </div>
       <div class="stats">
-        <div class="stats__health-bar--enemy">Enemy health bar</div>
-        <div class="stats__power-bar--enemy">Enemy power up bar</div>
+        <div class="stats__health-bar--enemy"></div>
+        <div class="stats__power-bar--enemy"></div>
       </div>
     </div>
     <canvas id="canvas"></canvas>
   </div>
-  <script src="/src/classes.ts"></script>
+
+  <audio id="backgroundMusic" src="" loop></audio>
+
+  <script src="/src/game.ts"></script>
+  <script src="/src/config.ts"></script>
+  <script src="/src/character.ts"></script>
+  <script src="/src/utils.ts"></script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
